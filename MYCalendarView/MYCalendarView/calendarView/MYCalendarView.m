@@ -8,6 +8,7 @@
 
 #import "MYCalendarView.h"
 #import "MYDateFormatter.h"
+#import "DateBtn.h"
 
 #define leftBtnWidth        15
 #define yearLabelHeight     40
@@ -42,6 +43,7 @@
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
+        self.layer.masksToBounds = YES;
         _calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
         _dayInfoUnits = NSEraCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
         _calendarDate = [NSDate date];
@@ -137,29 +139,17 @@
         CGFloat x = ((weekdayBeginning+i-1)%7);
         CGFloat y = ((weekdayBeginning+i-1)/7);
         
-        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(x*_btnFrameWidth,
-                                                                y*_btnFrameWidth+_yearMonthLabel.frame.origin.y+_yearMonthLabel.frame.size.height+_btnFrameWidth,
-                                                                _btnFrameWidth,
-                                                                _btnFrameWidth)];
-        _contentHeight = view.frame.origin.y+view.frame.size.height;
-        [view setBackgroundColor:[UIColor clearColor]];
+        DateBtn *dateBtn = [[DateBtn alloc] initWithFrame:CGRectMake(x*_btnFrameWidth,
+                                                                    y*_btnFrameWidth+_yearMonthLabel.frame.origin.y+_yearMonthLabel.frame.size.height+_btnFrameWidth,
+                                                                    _btnFrameWidth,
+                                                                     _btnFrameWidth)];
+        _contentHeight = dateBtn.frame.origin.y+dateBtn.frame.size.height;
         
-        UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn.frame = CGRectMake(3,3,_btnFrameWidth-6,_btnFrameWidth-6);
-        [view addSubview:btn];
-        [btn setTitle:[NSString stringWithFormat:@"%ld",i+1] forState:UIControlStateNormal];
-        [btn addTarget:self action:@selector(dayBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        btn.tag = components.day;
-        
-        [btn setTitleColor:[UIColor colorWithRed:25/255.0 green:160/255.0 blue:133/255.0 alpha:1] forState:UIControlStateNormal];
-        [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
-        [btn setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
-        
-        [btn setBackgroundImage:[UIImage imageNamed:@"点选－已选日期－红"] forState:UIControlStateSelected];
-        
-        btn.layer.masksToBounds = YES;
-        btn.layer.cornerRadius = btn.frame.size.width/2;
-        [self addSubview:view];
+        [dateBtn setTitle:[NSString stringWithFormat:@"%ld",i+1] forState:UIControlStateNormal];
+        [dateBtn addTarget:self action:@selector(dayBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        dateBtn.tag = components.day;
+
+        [self addSubview:dateBtn];
         
         NSDate *today = [NSDate date];
         NSDate *comsDate = [_calendar dateFromComponents:components];
@@ -169,16 +159,15 @@
         if ([today compare:comsDate] == NSOrderedAscending) {
             for (NSString *unselectDay in _unSelectedDays) {
                 if ([unselectDay isEqualToString:comsStr]) {
-                    btn.enabled = NO;
-                    [btn setBackgroundImage:[UIImage imageNamed:@"点选－不可选日期－灰"]forState:UIControlStateDisabled];
+                    dateBtn.enabled = NO;
                     break;
                 }
             }
         }else if ([today compare:comsDate] == NSOrderedDescending){
-            btn.enabled = NO;
+            dateBtn.enabled = NO;
         }
         
-        [_daysInCurrentMonth addObject:btn];
+        [_daysInCurrentMonth addObject:dateBtn];
     }
 }
 
@@ -190,11 +179,12 @@
     components.month ++;
     NSDate * nextMonthDate =[_calendar dateFromComponents:components];
     _calendarDate = nextMonthDate;
+    
+    [_selectedDays removeAllObjects];
+    [self setMonth];
     if (self.delegate && [self.delegate respondsToSelector:@selector(nextMonthBtnClick:)]) {
         [self.delegate nextMonthBtnClick:self];
     }
-    [_selectedDays removeAllObjects];
-    [self setMonth];
 }
 
 - (void)preMonth{
@@ -203,11 +193,12 @@
     components.month --;
     NSDate * prevMonthDate = [_calendar dateFromComponents:components];
     _calendarDate = prevMonthDate;
+    
+    [_selectedDays removeAllObjects];
+    [self setMonth];
     if (self.delegate && [self.delegate respondsToSelector:@selector(preMonthBtnClick:)]) {
         [self.delegate preMonthBtnClick:self];
     }
-    [_selectedDays removeAllObjects];
-    [self setMonth];
 }
 
 #pragma mark -
@@ -224,6 +215,7 @@
     
     if (self.selectedType == selectedType_mutable) {
         if (sender.selected) {
+            [_selectedDays removeObject:date2];
             [_selectedDays addObject:date2];
             [_selectedBtns addObject:sender];
         }else{

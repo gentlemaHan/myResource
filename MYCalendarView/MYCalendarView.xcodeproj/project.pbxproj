@@ -20,6 +20,7 @@
 		148165381B1F1E1A006FD53B /* 点选－已选日期－红.png in Resources */ = {isa = PBXBuildFile; fileRef = 148165361B1F1E1A006FD53B /* 点选－已选日期－红.png */; };
 		1481653B1B1F1E6A006FD53B /* 点选－日期三角－left.png in Resources */ = {isa = PBXBuildFile; fileRef = 148165391B1F1E6A006FD53B /* 点选－日期三角－left.png */; };
 		1481653C1B1F1E6A006FD53B /* 点选－日期三角－right.png in Resources */ = {isa = PBXBuildFile; fileRef = 1481653A1B1F1E6A006FD53B /* 点选－日期三角－right.png */; };
+		14AA3AD21B20403600214D80 /* DateBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = 14AA3AD11B20403600214D80 /* DateBtn.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,8 @@
 		148165361B1F1E1A006FD53B /* 点选－已选日期－红.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "点选－已选日期－红.png"; sourceTree = "<group>"; };
 		148165391B1F1E6A006FD53B /* 点选－日期三角－left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "点选－日期三角－left.png"; sourceTree = "<group>"; };
 		1481653A1B1F1E6A006FD53B /* 点选－日期三角－right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "点选－日期三角－right.png"; sourceTree = "<group>"; };
+		14AA3AD01B20403600214D80 /* DateBtn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DateBtn.h; sourceTree = "<group>"; };
+		14AA3AD11B20403600214D80 /* DateBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DateBtn.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +148,8 @@
 				148165331B1F1D81006FD53B /* MYDateFormatter.m */,
 				1481652F1B1F1BDA006FD53B /* MYCalendarView.h */,
 				148165301B1F1BDA006FD53B /* MYCalendarView.m */,
+				14AA3AD01B20403600214D80 /* DateBtn.h */,
+				14AA3AD11B20403600214D80 /* DateBtn.m */,
 			);
 			path = calendarView;
 			sourceTree = "<group>";
@@ -255,6 +260,7 @@
 			files = (
 				148165111B1F1B46006FD53B /* ViewController.m in Sources */,
 				148165341B1F1D81006FD53B /* MYDateFormatter.m in Sources */,
+				14AA3AD21B20403600214D80 /* DateBtn.m in Sources */,
 				1481650E1B1F1B46006FD53B /* AppDelegate.m in Sources */,
 				148165311B1F1BDA006FD53B /* MYCalendarView.m in Sources */,
 				1481650B1B1F1B46006FD53B /* main.m in Sources */,
@@ -458,6 +464,7 @@
 				1481652A1B1F1B47006FD53B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1481652B1B1F1B47006FD53B /* Build configuration list for PBXNativeTarget "MYCalendarViewTests" */ = {
 			isa = XCConfigurationList;
@@ -466,6 +473,7 @@
 				1481652D1B1F1B47006FD53B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

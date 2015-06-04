@@ -43,13 +43,13 @@ typedef enum{
 
 @property (nonatomic,assign)            id<MYCalendarViewDelegate>delegate;
 /**
- *  子视图布局实际上是根据frame.size.with来布局的(即子视图和self.frame的宽适应,但是不一定self.frame的高适应,)
+ *  子视图布局实际上是根据frame.size.with来布局的(即子视图和self.frame的宽适应,但是不一定self.frame的高适应,因此你可能会遇到显示不全的情况)
     此属性即表示设置self.frame之后,子视图所需要的最适合高度
     当你设置完frame之后,可以添加如下代码:
     CGRect frame = calendarView.frame;
     frame.size.height = contentHeight;
     calendar.frame = frame;
-    来确保宽高都达到最适
+    来确保高度为到最适
  */
 @property (nonatomic,assign,readonly)   CGFloat contentHeight;
 
