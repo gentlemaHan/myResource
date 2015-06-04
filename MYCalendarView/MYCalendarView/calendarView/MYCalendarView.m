@@ -9,9 +9,9 @@
 #import "MYCalendarView.h"
 #import "MYDateFormatter.h"
 
-const CGFloat leftBtnWidth = 15;
-const CGFloat yearLabelHeight = 40;
-const CGFloat spaceH = 10;
+#define leftBtnWidth        15
+#define yearLabelHeight     40
+#define spaceH              10
 
 
 
@@ -31,11 +31,10 @@ const CGFloat spaceH = 10;
     NSMutableArray      *_selectedDays;
     NSMutableArray      *_selectedBtns;
     NSArray             *_unSelectedDays;
-    BOOL                _needResetSubviewFrame;
 }
 
 - (instancetype)init{
-    self = [self initWithFrame:CGRectMake(0, 0, 320, 300)];
+    self = [self initWithFrame:CGRectMake(0, 0, 200, 200)];
     
     return self;
 }
@@ -43,24 +42,32 @@ const CGFloat spaceH = 10;
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
-        self.layer.masksToBounds = YES;
-        _needResetSubviewFrame = YES;
+        _calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        _dayInfoUnits = NSEraCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
+        _calendarDate = [NSDate date];
+        _selectedType = selectedType_mutable;
+        
+        _daysInCurrentMonth = [NSMutableArray array];
+        _selectedDays = [NSMutableArray array];
+        _selectedBtns = [NSMutableArray array];
+        _shortWeekdaySymbols = @[@"日",@"一",@"二",@"三",@"四",@"五",@"六"];
+
         [self initSubViews];
         [self setSubFrame:frame];
+        [self setMonth];
     }
     return self;
 }
+
+-(void)setFrame:(CGRect)frame{
+    [super setFrame:frame];
+    [self setSubFrame:frame];
+    [self setMonth];
+}
+
 #pragma mark -
+
 - (void)initSubViews{
-    _calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    _dayInfoUnits = NSEraCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
-    _calendarDate = [NSDate date];
-    _selectedType = selectedType_mutable;
-    
-    _daysInCurrentMonth = [NSMutableArray array];
-    _selectedDays = [NSMutableArray array];
-    _selectedBtns = [NSMutableArray array];
-    
     _yearMonthLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _yearMonthLabel.textAlignment = NSTextAlignmentCenter;
     [_yearMonthLabel setTextColor:[UIColor colorWithRed:25/255.0 green:160/255.0 blue:133/255.0 alpha:1]];
@@ -76,42 +83,37 @@ const CGFloat spaceH = 10;
     [self addSubview:_rightBtn];
     [_rightBtn addTarget:self action:@selector(nextMonth) forControlEvents:UIControlEventTouchUpInside];
     
-    
-    _shortWeekdaySymbols = @[@"日",@"一",@"二",@"三",@"四",@"五",@"六"];
-    [_shortWeekdaySymbols enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        UILabel *la = [[UILabel alloc] init];
+    for (int i=0;i<_shortWeekdaySymbols.count;i++) {
+        NSString *text = [_shortWeekdaySymbols objectAtIndex:i];
+        UILabel *la = [[UILabel alloc] initWithFrame:CGRectZero];
         la.textAlignment = NSTextAlignmentCenter;
-        la.text = obj;
-        la.tag = 100+idx;
+        la.text = text;
+        la.tag = 100 + i;
         [self addSubview:la];
-    }];
+    }
 }
 
 - (void)setSubFrame:(CGRect)frame{
-    if (!_needResetSubviewFrame) {
-        return;
-    }
-    _btnFrameWidth = frame.size.width / 9;
+
+    _btnFrameWidth = frame.size.width / 7;
     
-    _yearMonthLabel.frame = CGRectMake((frame.size.width-frame.size.width/3)/2, 0, frame.size.width/3, yearLabelHeight);
+    _yearMonthLabel.frame = CGRectMake(frame.size.width/6, 0, frame.size.width*2/3, yearLabelHeight);
     
     _leftBtn.frame = CGRectMake(_yearMonthLabel.frame.origin.x-leftBtnWidth-spaceH, (yearLabelHeight-leftBtnWidth)/2, leftBtnWidth, leftBtnWidth);
     
     _rightBtn.frame = CGRectMake(_yearMonthLabel.frame.origin.x+_yearMonthLabel.frame.size.width+spaceH, _leftBtn.frame.origin.y, leftBtnWidth, leftBtnWidth);
     
-    [_shortWeekdaySymbols enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        NSInteger tag = 100+idx;
-        UIView *view = [self viewWithTag:tag];
-        view.frame = CGRectMake(_btnFrameWidth*idx+_btnFrameWidth,
+    for (int i=0; i<_shortWeekdaySymbols.count; i++) {
+        NSInteger tag = 100+i;
+        UILabel *la = (UILabel *)[self viewWithTag:tag];
+        la.frame = CGRectMake(_btnFrameWidth*i,
                                 _yearMonthLabel.frame.origin.y+_yearMonthLabel.frame.size.height,
                                 _btnFrameWidth, _btnFrameWidth);
-    }];
-    [self setMonth];
+    }
 }
 #pragma mark -
 
 - (void)setMonth{
-    [_selectedDays removeAllObjects];
     NSDateComponents *components = [_calendar components:_dayInfoUnits fromDate:_calendarDate];
     
     _yearMonthLabel.text = [NSString stringWithFormat:@"%ld 年 %ld 月",components.year,components.month];
@@ -135,7 +137,7 @@ const CGFloat spaceH = 10;
         CGFloat x = ((weekdayBeginning+i-1)%7);
         CGFloat y = ((weekdayBeginning+i-1)/7);
         
-        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(x*_btnFrameWidth+_btnFrameWidth,
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(x*_btnFrameWidth,
                                                                 y*_btnFrameWidth+_yearMonthLabel.frame.origin.y+_yearMonthLabel.frame.size.height+_btnFrameWidth,
                                                                 _btnFrameWidth,
                                                                 _btnFrameWidth)];
@@ -178,10 +180,9 @@ const CGFloat spaceH = 10;
         
         [_daysInCurrentMonth addObject:btn];
     }
-    CGRect frame = self.frame;
-    frame.size.height = _contentHeight;
-    self.frame = frame;
 }
+
+#pragma mark -
 
 - (void)nextMonth{
     NSDateComponents *components = [_calendar components:_dayInfoUnits fromDate:_calendarDate];
@@ -189,10 +190,11 @@ const CGFloat spaceH = 10;
     components.month ++;
     NSDate * nextMonthDate =[_calendar dateFromComponents:components];
     _calendarDate = nextMonthDate;
-    [self setMonth];
     if (self.delegate && [self.delegate respondsToSelector:@selector(nextMonthBtnClick:)]) {
         [self.delegate nextMonthBtnClick:self];
     }
+    [_selectedDays removeAllObjects];
+    [self setMonth];
 }
 
 - (void)preMonth{
@@ -201,10 +203,11 @@ const CGFloat spaceH = 10;
     components.month --;
     NSDate * prevMonthDate = [_calendar dateFromComponents:components];
     _calendarDate = prevMonthDate;
-    [self setMonth];
     if (self.delegate && [self.delegate respondsToSelector:@selector(preMonthBtnClick:)]) {
         [self.delegate preMonthBtnClick:self];
     }
+    [_selectedDays removeAllObjects];
+    [self setMonth];
 }
 
 #pragma mark -
@@ -227,7 +230,7 @@ const CGFloat spaceH = 10;
             [_selectedDays removeObject:date2];
             [_selectedBtns removeObject:sender];
         }
-    }else{
+    }else if (self.selectedType == selectedType_single) {
         if (sender.selected) {
             [_selectedBtns enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 UIButton *btn = (UIButton *)obj;
@@ -253,29 +256,11 @@ const CGFloat spaceH = 10;
     return _selectedDays;
 }
 
-- (void)setFrame:(CGRect)frame{
-    if (frame.size.width != self.frame.size.width) {
-        _needResetSubviewFrame = YES;
-    }else{
-        _needResetSubviewFrame = NO;
-    }
-    [super setFrame:frame];
-    [self setSubFrame:frame];
-}
 #pragma mark -
+
 -(void)setUnSelectDays:(NSArray *)days{
     _unSelectedDays = [NSArray arrayWithArray:days];
     [self setMonth];
 }
-
-
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
 
 @end

@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "MYCalendarView.h"
 
-@interface ViewController ()
+@interface ViewController ()<MYCalendarViewDelegate>
 
 @property (nonatomic,strong)    MYCalendarView *calendarView;
 
@@ -20,13 +20,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.calendarView = [[MYCalendarView alloc] init];
+    self.calendarView.delegate = self;
+    self.calendarView.selectedType = selectedType_single;
     [self.view addSubview:self.calendarView];
-    self.calendarView.backgroundColor = [UIColor greenColor];
+
 }
 
 -(void)viewDidLayoutSubviews{
-    self.calendarView.frame = CGRectMake(0, 80, self.view.frame.size.width, 40);
+    self.calendarView.frame = CGRectMake(0, 80, 200, 300);
+    CGRect frame = self.calendarView.frame;
+    frame.size.height = self.calendarView.contentHeight;
+    self.calendarView.frame = frame;
 }
 
+#pragma mark - MYCalendarViewDelegate
 
 @end
